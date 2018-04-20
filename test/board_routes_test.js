@@ -51,12 +51,17 @@ describe('Boards', () => {
   })
 
   describe('/GET board', () => {
-    it('should return not implement', (done) => {
+    it('should return new board', (done) => {
       chai.request(server)
         .get('/board')
         .end((err, res) => {
-          res.should.have.status(501);
-          res.text.should.equal('Not Implemented');
+          res.should.have.status(200);
+          res.body.should.have.property('ocean');
+          res.body.ocean.length.should.be.eql(10);
+          res.body.ocean[0].length.should.be.eql(10);
+          res.body.should.have.property('_id');
+          res.body.should.have.property('moveNum');
+          res.body.should.have.property('createAt');
           done();
         });
     });

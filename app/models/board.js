@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const BoardSchema = new Schema(
   {
-    board: { type: [ [String] ] ,require:true },
+    ocean: { type: Array ,require:true },
     moveNum : { type: Number, required: true },
     createAt: { type: Date, default: Date.now }
   }
