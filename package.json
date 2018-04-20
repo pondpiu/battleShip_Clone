@@ -4,7 +4,8 @@
   "description": "battleShip_clone_assignment",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "mocha"
   },
   "repository": "https://github.com/pondpiu/battleShip_Clone.git",
   "author": "pondpiu",
@@ -18,6 +19,9 @@
     "morgan": "^1.9.0"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.1.1",
     "nodemon": "^1.17.3"
   }
 }

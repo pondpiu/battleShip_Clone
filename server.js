@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 if (app.get('env') == 'production') {
   app.use(morgan('common', { skip: function(req, res) { return res.statusCode < 400 }, stream: __dirname + '/../morgan.log' }));
-} else {
+} else if (app.get('env') !== 'test') {
   app.use(morgan('dev'));
 }
 
@@ -24,8 +24,7 @@ const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 
-db.once('open', function() {
-  // we're connected!
-  require('./app/routes')(app, db)
-  app.listen(PORT, () => console.log('listening on port:', PORT));
-});
+require('./app/routes')(app)
+app.listen(PORT, () => console.log('listening on port:', PORT));
+
+module.exports = app; // for testing
