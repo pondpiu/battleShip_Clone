@@ -1,15 +1,20 @@
 const hello = require('./hello_routes');
-const attackRoutes = require('./board/attack_routes');
-const boardRoutes = require('./board/board_routes');
-const initializeRoutes = require('./board/initialize_routes');
-
+const board = require('./board_routes')
 module.exports = function(app) {
   app.route('/hello')
     .get(hello.getHello)
     .post(hello.postHello);
 
-  // helloRoutes(app);
-  attackRoutes(app);
-  boardRoutes(app);
-  initializeRoutes(app);
+  app.route('/board')
+    .get(board.initilize);
+
+  app.route('/board/:id')
+    .get(board.getBoardById);
+
+  app.route('/board/attack/:id')
+    .post(board.attack);
+
+  app.route('/board/reset/:id')
+    .get(board.reset);
+
 };
