@@ -5,6 +5,9 @@ module.exports = function(app) {
     .get(hello.getHello)
     .post(hello.postHello);
 
+  app.route('/board/list')
+    .get(board.getBoards);
+
   app.route('/board')
     .get(board.initilize);
 
@@ -16,5 +19,8 @@ module.exports = function(app) {
 
   app.route('/board/reset/:id')
     .get(board.reset);
+
+  app.route('/board/history/:id')
+    .get(board.getHistoryById);
 
 };
