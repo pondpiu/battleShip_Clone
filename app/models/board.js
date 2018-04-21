@@ -3,9 +3,11 @@ const Schema = mongoose.Schema;
 
 const BoardSchema = new Schema(
   {
-    ocean: { type: Array ,require:true },
+    
     moveNum : { type: Number, required: true },
-    createAt: { type: Date, default: Date.now }
+    createAt: { type: Date, default: Date.now },
+    unitLeft : { type: Number, required: true },
+    ocean: { type: Array ,require:true }
   }
 )
 

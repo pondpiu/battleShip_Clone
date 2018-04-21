@@ -1,5 +1,7 @@
 const Water = require('./models/water');
 
+const Logger = require('../app/logger');
+
 //create the 2d array of empty water
 function createEmptyOcean(width,height){
   let ocean = [];
@@ -110,16 +112,50 @@ function createEmptyWater(){
 }
 
 function printOcean(ocean){
-  console.log("------ for debuggin only -----------");
   for(let i=0; i<ocean.length; i++){
     str = "";
     for (let j=0; j<ocean[i].length; j++){
       str += ocean[i][j].unit;
       str += " ";
     }
-    console.log(str);
+    Logger.log(str);
   }
-  console.log("------ for debuggin only -----------");
 }
 
-module.exports = { createEmptyOcean, placeShips, printOcean };
+function generateClientBoard(_id, moveNum, ocean, createAt){
+  const cleintOcean = ocean.map( (waterArray) =>{
+    return waterArray.map( (water) => {
+      visibleUnit = -1;
+      //only show unit type if its type 3 (already been sunk)
+      if(water.type == 3){
+        visibleUnit = water.unit;
+      }
+      visibleWater = {
+        type: water.type,
+        unit: visibleUnit
+      };
+      return visibleWater;
+    });
+  });
+
+  let clientBoard = {
+    boardId: _id,
+    moveNum: moveNum,
+    ocean: cleintOcean,
+    createAt: createAt
+  };
+  return clientBoard;
+}
+
+function generateNewOcean(){
+  return _generateNewOcean(10, 10, 1, 2, 3, 4);
+}
+
+function _generateNewOcean(width, height, numBattleShip, numCruisers, numDestroyers, numSubmarines){
+  const emptyOcean = createEmptyOcean(width,height);
+  const newOcean = placeShips(emptyOcean, numBattleShip, numCruisers, numDestroyers, numSubmarines);
+  totalUnit = numBattleShip + numCruisers + numDestroyers + numSubmarines;
+  return [newOcean, totalUnit];
+}
+
+module.exports = { printOcean, generateClientBoard, generateNewOcean };

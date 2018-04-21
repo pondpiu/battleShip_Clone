@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 const Board = require('../models/board');
 const BoardHistory = require('../models/boardHistory');
-const BattleShip = require('../battleShip')
+
+
+const Logger = require('../logger');
+const BattleShip = require('../battleShip');
+const History = require('../history');
 
 function getBoards(req, res){
-  const query = Board.find({});
+  const query = Board.find({}, '_id moveNum createAt');
   query.exec((err, boards) =>{
     if(err) res.send(err);
 
@@ -15,40 +19,44 @@ function getBoards(req, res){
 }
 
 function initilize(req, res){
-  const emptyOcean = BattleShip.createEmptyOcean(10,10);
-  const newOcean = BattleShip.placeShips(emptyOcean, 1, 2, 3, 4);
+  const newOcean = BattleShip.generateNewOcean(); 
   const newBoard = new Board(
     {
-      ocean: newOcean,
+      ocean: newOcean[0],
+      unitLeft: newOcean[1],
       moveNum: 0
     }
   );
   //send client version of the board
-  let visibleBoard = new Board(newBoard);
-  visibleBoard.ocean = visibleBoard.ocean.map( (waterArray) =>{
-    return waterArray.map( (water) => {
-      visibleUnit = -1;
-      //only show unit type if its type 3 (already been sunk)
-      if(water.type == 3){
-        visibleUnit = water.unit;
-      }
-      visibleWater = {
-        type: water.type,
-        unit: visibleUnit
-      };
-      return visibleWater;
-    });
-  });
+  let visibleBoard = BattleShip.generateClientBoard(newBoard._id, newBoard.moveNum, newBoard.ocean, newBoard.createAt);
   
   BattleShip.printOcean(newBoard.ocean);
 
-  res.status(200)
-    .send(newBoard);
+  newBoard.save((err,board) =>{
+    if(err){ res.send(err); }
+    else{
+      History.saveHistory(board)
+      res.status(200)
+        .json({message: "Board successfully initialize!", board: visibleBoard});
+    }
+  });
 }
 
 function getBoardById(req, res){
-  res.status(501)
-    .send('Not Implemented');
+  const query = Board.findById(req.params.id);
+  query.exec((err, board) => {
+    if(err) {res.send(err);}
+    else{
+      if(!board) {
+        res.status(200)
+          .json({message: "Board "+req.params.id+" not found"});
+      }else{
+        let visibleBoard = BattleShip.generateClientBoard(board.id, board.moveNum, board.ocean, board.createAt);
+        res.status(200)
+        .json({board: visibleBoard});
+      }
+    }
+  });
 }
 
 function attack(req, res){
@@ -57,15 +65,39 @@ function attack(req, res){
 }
 
 function reset(req, res){
-  res.status(501)
-    .send('Not Implemented');
+  const query = Board.findById(req.params.id);
+  query.exec((err, board) => {
+    if(err) {
+      res.send(err);
+    }
+    else{
+      if(!board) {
+        res.status(200)
+          .json({message: "Board "+req.params.id+" not found"});
+      }else{
+        let newOcean = BattleShip.generateNewOcean();
+        board.ocean = newOcean[0];
+        board.unitLeft = newOcean[1];
+        board.createAt = new Date();
+        board.moveNum = 0;
+        board.save((err, board) => {
+          if(err) { res.send(err); }
+          else{
+            let visibleBoard = BattleShip.generateClientBoard(board.id, board.moveNum, board.ocean, board.createAt);
+            res.status(200)
+            .json({message: "Board reset secuessfully", board: visibleBoard});
+          }
+        });
+      }
+    }
+  });
 }
 
 function getHistoryById(req, res){
   const query = BoardHistory.find({
-    id : req.params.id
+    boardId : req.params.id
   });
-  query.exec((err, boardHistories) =>{
+  query.exec((err, boardHistories) => {
     if(err) res.send(err);
 
     res.status(200)
