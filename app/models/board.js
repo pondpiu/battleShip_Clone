@@ -3,19 +3,18 @@ const Schema = mongoose.Schema;
 
 const BoardSchema = new Schema(
   {
-    
     moveNum : { type: Number, required: true },
-    createAt: { type: Date, default: Date.now },
+    updateAt: { type: Date, default: Date.now },
     unitLeft : { type: Number, required: true },
     ocean: { type: Array ,require:true }
   }
 )
 
-// Sets the createdAt parameter equal to the current time
+// Sets the updateAt parameter equal to the current time
 BoardSchema.pre('save', next => {
   now = new Date();
-  if(!this.createdAt) {
-    this.createdAt = now;
+  if(!this.updateAt) {
+    this.updateAt = now;
   }
   next();
 });

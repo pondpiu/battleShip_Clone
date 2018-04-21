@@ -3,14 +3,15 @@ const BoardHistory = require('./models/boardHistory');
 
 const Logger = require('../app/logger');
 
-function saveHistory( board , callback ){
+function saveHistory( board, msg, callback ){
   boardHistory = new BoardHistory(
     {
       boardId: board._id,
       ocean: board.ocean,
       moveNum : board.moveNum,
-      createAt: board.createAt,
-      unitLeft: board.unitLeft
+      createAt: board.updateAt,
+      unitLeft: board.unitLeft,
+      message: msg
     }
   );
 

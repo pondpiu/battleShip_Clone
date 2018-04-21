@@ -1,10 +1,12 @@
+const Logger = require('../logger');
+
 function getHello(req,res){
 	res.status(200) 
 		.send('Hello World!');
 }
 
 function postHello(req,res){
-	console.log(req.body);
+	Logger.log(req.body);
 	res.status(200) 
 		.send('Hello World!');
 }

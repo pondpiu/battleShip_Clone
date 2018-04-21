@@ -12,6 +12,7 @@ const PORT = process.env.PORT;
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ type: 'application/json'}));  
 
 if (app.get('env') == 'production') {
   app.use(morgan('common', { skip: function(req, res) { return res.statusCode < 400 }, stream: __dirname + '/../morgan.log' }));

@@ -8,6 +8,7 @@ const BoardHistorySchema = new Schema(
     createAt: { type: Date, required: true },
     unitLeft : { type: Number, required: true },
     ocean: { type: Array ,require:true },
+    message : { type: String, required:true }
   }
 )
 

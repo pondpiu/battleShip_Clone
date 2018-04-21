@@ -66,16 +66,18 @@ describe('Boards', () => {
     });
     it('should GET all boardHistory of the Board with id = :id', (done) => {
       const newBoard = createNewBoard();
-      newBoard.save((err,board) => {
-        History.saveHistory(board, (boardHistory) => {
+      newBoard.save((err, board) => {
+        History.saveHistory(board, "initialize", (boardHistory) => {
           chai.request(server)
-          .get('/board/history/'+ boardHistory.boardId)
-          .end((err, res) => {
-            res.should.have.status(200);
-            res.body.should.be.a('array');
-            res.body.length.should.be.eql(1);
-            done();
-          })
+            .get('/board/history/' + boardHistory.boardId)
+            .end((err, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('array');
+              res.body.length.should.be.eql(1);
+              res.body[0].should.have.property('message');
+              res.body[0].message.should.be.eql("initialize")
+              done();
+            })
         });
       })
     });
@@ -127,34 +129,56 @@ describe('Boards', () => {
       const newBoard = createNewBoard();
       newBoard.save((err, board) => {
         chai.request(server)
-        .get('/board/' + board.id)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.have.property('board');
-          res.body.board.should.be.a('object');
-          res.body.board.should.have.property('ocean');
-          res.body.board.ocean.length.should.be.eql(10);
-          res.body.board.ocean[0].length.should.be.eql(10);
-          res.body.board.should.have.property('boardId');
-          res.body.board.should.have.property('moveNum');
-          res.body.board.should.have.property('createAt');
-          done();
-        });
+          .get('/board/' + board.id)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('board');
+            res.body.board.should.be.a('object');
+            res.body.board.should.have.property('ocean');
+            res.body.board.ocean.length.should.be.eql(10);
+            res.body.board.ocean[0].length.should.be.eql(10);
+            res.body.board.should.have.property('boardId');
+            res.body.board.should.have.property('moveNum');
+            res.body.board.should.have.property('createAt');
+            done();
+          });
       });
     });
   });
 
   describe('/POST board/attack/:id', () => {
-    it('should return not implement', (done) => {
+    it('should POST board/attack by id with invalid id', (done) => {
+      coord = {
+        x: '0',
+        y: '0'
+      };
       chai.request(server)
         .post('/board/attack/1234')
-        .send({ x: '1', y: '2' })
+        .send(coord)
         .end((err, res) => {
-          res.should.have.status(501);
-          res.text.should.equal('Not Implemented');
+          res.should.have.status(200);
+          res.body.kind.should.be.eql("ObjectId");
+          res.body.path.should.be.eql("_id");
           done();
         });
     });
+    it('should POST board/attack by id =:id at pos { :x, :y }', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '0',
+        y: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            done();
+          });
+      });
+    })
   });
 
   describe('/GET board/reset/:id', () => {
@@ -181,44 +205,44 @@ describe('Boards', () => {
     });
     it('should GET board reset by id = :id', (done) => {
       const newBoard = createNewBoard();
-      //TODO attack ocean
+      let battleResult = BattleShip.attackWaterAtPos(0, 0, newBoard.ocean);
       newBoard.save((err, board) => {
         chai.request(server)
-        .get('/board/reset/'+board.id)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.have.property('message');
-          res.body.message.should.be.eql("Board reset secuessfully");
-          res.body.should.have.property('board');
-          res.body.board.should.have.property('ocean');
-          res.body.board.ocean.length.should.be.eql(10);
-          res.body.board.ocean[0].length.should.be.eql(10);
-          res.body.board.should.have.property('boardId');
-          res.body.board.boardId.should.be.eql(board.id)
-          res.body.board.should.have.property('moveNum');
-          res.body.board.should.have.property('createAt');
-          let ocean = res.body.board.ocean;
-          for (let wave of ocean ){
-            for (let water of wave){
-              // all the water inside ocean array should get reset back to unknow type (type = 0)
-              water.type.should.be.eql(0);
+          .get('/board/reset/' + board.id)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql("Board reset secuessfully");
+            res.body.should.have.property('board');
+            res.body.board.should.have.property('ocean');
+            res.body.board.ocean.length.should.be.eql(10);
+            res.body.board.ocean[0].length.should.be.eql(10);
+            res.body.board.should.have.property('boardId');
+            res.body.board.boardId.should.be.eql(board.id)
+            res.body.board.should.have.property('moveNum');
+            res.body.board.should.have.property('createAt');
+            let ocean = res.body.board.ocean;
+            for (let wave of ocean) {
+              for (let water of wave) {
+                // all the water inside ocean array should get reset back to unknow type (type = 0)
+                water.type.should.be.eql(0);
+              }
             }
-          }
-          done();
-        });
+            done();
+          });
       });
     });
   });
 
 });
 
-function createNewBoard(){
+function createNewBoard() {
   const newOcean = BattleShip.generateNewOcean();
   const newBoard = new Board(
     {
       ocean: newOcean[0],
       unitLeft: newOcean[1],
-      moveNum: 0,
+      moveNum: 0
     }
   );
 
