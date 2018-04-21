@@ -204,7 +204,6 @@ function attackWaterAtPos(x, y, ocean){
   if( targetWater.unit == 4 ){
     return trySunk(headX, headY, orientation, 1, "Submarines", ocean);
   }
-
   return [0, "Some errors occured. The unit type "+ targetWater.unit + " of the water is not a valid unit type. "]
   
 }
@@ -217,7 +216,8 @@ function checkShipSunk(x, y, orientation, length, ocean){
   }else{
     dy = 1;
   }
-  let sunkOcean = ocean;
+  
+  let sunkOcean = JSON.parse(JSON.stringify(ocean)); //clone the ocean
 
   for(let i=0; i<length;i++){
     if(ocean[y+(i*dy)][x+(i*dx)].type == 0){ // not sunk

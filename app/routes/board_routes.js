@@ -75,15 +75,17 @@ function attack(req, res){
     attackResult = attackOceanAtPos(req.body.x, req.body.y, board);
     resultCode = attackResult[0];
     resultMsg = attackResult[1];
-    board = attackResult[2];
-    board.save((err, board) => {
+    let newBoard = attackResult[2];
+    newBoard.markModified('ocean'); // mongoose dont detect change in nested array, mark it manually
+    newBoard.save((err, savedBoard) => {
       if(err) { res.send(err); return; }
       let response = {};
-      if(board.unitLeft < 1){
-        resultMsg = "Win !  You completed the game in "+ board.moveNum +" moves";
-        response.board = board;
+      if(savedBoard.unitLeft < 1){
+        resultMsg = "Win !  You completed the game in "+ savedBoard.moveNum +" moves";
+        response.board = savedBoard;
       }
-      History.saveHistory(board, resultMsg);
+
+      History.saveHistory(savedBoard, resultMsg);
       response.message = resultMsg;
       res.status(200)
         .json(response)
@@ -104,13 +106,13 @@ function reset(req, res){
     let newOcean = BattleShip.generateNewOcean();
     board.ocean = newOcean[0];
     board.unitLeft = newOcean[1];
-    board.createAt = new Date();
+    board.updateAt = new Date();
     board.moveNum = 0;
     board.save((err, board) => {
       if(err) { res.send(err); return; }
 
       History.saveHistory(board, "reset");
-      let visibleBoard = BattleShip.generateClientBoard(board.id, board.moveNum, board.ocean, board.updateAt);
+      const visibleBoard = BattleShip.generateClientBoard(board.id, board.moveNum, board.ocean, board.updateAt);
       res.status(200)
       .json({message: "Board reset secuessfully", board: visibleBoard});
     });
@@ -136,7 +138,6 @@ function attackOceanAtPos(x, y, board){
   const resultCode = battleResult[0];
   const resultMsg = battleResult[1];
   const resultOcean = battleResult[2];
-  
   board.ocean = resultOcean;
   board.updateAt = new Date();
   board.moveNum = board.moveNum+1;
