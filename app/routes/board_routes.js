@@ -58,7 +58,7 @@ function getBoardById(req, res){
 }
 
 function attack(req, res){
-  if(!req.body.x || !req.body.y){ res.status(400).send("Bad Request : missing x or y payload") }
+  if(req.body.x == null || req.body.y == null){ res.status(400).send("Bad Request : missing x or y payload"); return; }
   const query = Board.findById(req.params.id);
   query.exec((err, board) => {
     if(err) { res.send(err); return;}

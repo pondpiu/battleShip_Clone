@@ -287,6 +287,51 @@ describe('Boards', () => {
           });
       });
     });
+    it('should not POST board/attack by id with missing payload', (done) => {
+      const newBoard = createNewBoard();
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.should.have.property('text');
+            res.text.should.be.eql('Bad Request : missing x or y payload')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with missing pos x', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        y: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.should.have.property('text');
+            res.text.should.be.eql('Bad Request : missing x or y payload')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with missing pos y', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.should.have.property('text');
+            res.text.should.be.eql('Bad Request : missing x or y payload')
+            done();
+          });
+      });
+    });
   });
 
   describe('/GET board/reset/:id', () => {
@@ -341,7 +386,6 @@ describe('Boards', () => {
         });
     });
   });
-
 });
 
 function createNewBoard() {

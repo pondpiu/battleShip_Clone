@@ -139,8 +139,8 @@ function generateClientBoard(_id, moveNum, ocean, createAt){
   const cleintOcean = ocean.map( (waterArray) =>{
     return waterArray.map( (water) => {
       visibleUnit = -1;
-      //only show unit type if its type 3 (already been sunk)
-      if(water.type == 3){
+      //only show unit type if its type 1 or 3 ( miss or sunk)
+      if(water.type == 1 || water.type == 3){
         visibleUnit = water.unit;
       }
       visibleWater = {
