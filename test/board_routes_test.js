@@ -28,16 +28,6 @@ describe('Boards', () => {
   })
 
   describe('/GET board/list', () => {
-    it('should GET board list with empty db', (done) => {
-      chai.request(server)
-        .get('/board/list')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('array');
-          res.body.length.should.be.eql(0);
-          done();
-        })
-    });
     it('should GET all boards', (done) => {
       const newBoard = createNewBoard();
       newBoard.save((err, board) => {
@@ -51,12 +41,9 @@ describe('Boards', () => {
           })
       });
     });
-  });
-
-  describe('/GET board/history/:id', () => {
-    it('should GET boardHistory by id with empty db', (done) => {
+    it('should GET board list with empty db', (done) => {
       chai.request(server)
-        .get('/board/history/1234')
+        .get('/board/list')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
@@ -64,6 +51,9 @@ describe('Boards', () => {
           done();
         })
     });
+  });
+
+  describe('/GET board/history/:id', () => {
     it('should GET all boardHistory of the Board with id = :id', (done) => {
       const newBoard = createNewBoard();
       newBoard.save((err, board) => {
@@ -80,6 +70,16 @@ describe('Boards', () => {
             })
         });
       })
+    });
+    it('should GET boardHistory by id with empty db', (done) => {
+      chai.request(server)
+        .get('/board/history/1234')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('array');
+          res.body.length.should.be.eql(0);
+          done();
+        })
     });
   })
 
@@ -104,27 +104,6 @@ describe('Boards', () => {
   });
 
   describe('/GET board/:id', () => {
-    it('should GET boaes by id with invalid id', (done) => {
-      chai.request(server)
-        .get('/board/1234')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.kind.should.be.eql("ObjectId");
-          res.body.path.should.be.eql("_id");
-          done();
-        });
-    })
-    it('should GET board by id with empty db', (done) => {
-      chai.request(server)
-        .get('/board/41224d776a326fb40f000001')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.have.property('message');
-          res.body.message.should.be.eql("Board 41224d776a326fb40f000001 not found");
-          res.body.should.not.have.property('board');
-          done();
-        });
-    });
     it('should GET board by id = :id', (done) => {
       const newBoard = createNewBoard();
       newBoard.save((err, board) => {
@@ -144,24 +123,30 @@ describe('Boards', () => {
           });
       });
     });
-  });
-
-  describe('/POST board/attack/:id', () => {
-    it('should POST board/attack by id with invalid id', (done) => {
-      coord = {
-        x: '0',
-        y: '0'
-      };
+    it('should GET board by id with empty db', (done) => {
       chai.request(server)
-        .post('/board/attack/1234')
-        .send(coord)
+        .get('/board/41224d776a326fb40f000001')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('message');
+          res.body.message.should.be.eql("Board 41224d776a326fb40f000001 not found");
+          res.body.should.not.have.property('board');
+          done();
+        });
+    });
+    it('should not GET board by id with invalid id', (done) => {
+      chai.request(server)
+        .get('/board/1234')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.kind.should.be.eql("ObjectId");
           res.body.path.should.be.eql("_id");
           done();
         });
-    });
+    })
+  });
+
+  describe('/POST board/attack/:id', () => {
     it('should POST board/attack by id =:id at pos { :x, :y }', (done) => {
       const newBoard = createNewBoard();
       coord = {
@@ -178,13 +163,15 @@ describe('Boards', () => {
             done();
           });
       });
-    })
-  });
-
-  describe('/GET board/reset/:id', () => {
-    it('should GET board reset by id with invalid id', (done) => {
+    });
+    it('should not POST board/attack by id with invalid id', (done) => {
+      coord = {
+        x: '0',
+        y: '0'
+      };
       chai.request(server)
-        .get('/board/reset/1234')
+        .post('/board/attack/1234')
+        .send(coord)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.kind.should.be.eql("ObjectId");
@@ -192,17 +179,117 @@ describe('Boards', () => {
           done();
         });
     });
-    it('should GET board reset by id with empty db', (done) => {
-      chai.request(server)
-        .get('/board/reset/41224d776a326fb40f000001')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.have.property('message');
-          res.body.message.should.be.eql("Board 41224d776a326fb40f000001 not found");
-          res.body.should.not.have.property('board');
-          done();
-        });
+    it('should not POST board/attack by id with invalid overflow pos x', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '10',
+        y: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(10,0) is not a valid coordinate')
+            done();
+          });
+      });
     });
+    it('should not POST board/attack by id with invalid overflow pos y', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '0',
+        y: '10'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(0,10) is not a valid coordinate')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with invalid underflow pos x', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '-1',
+        y: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(-1,0) is not a valid coordinate')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with invalid underflow pos y', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '0',
+        y: '-1'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(0,-1) is not a valid coordinate')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with invalid non number pos x', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: 'str',
+        y: '0'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(str,0) is not a valid coordinate')
+            done();
+          });
+      });
+    });
+    it('should not POST board/attack by id with invalid non number pos y', (done) => {
+      const newBoard = createNewBoard();
+      coord = {
+        x: '0',
+        y: 'str'
+      };
+      newBoard.save((err, board) => {
+        chai.request(server)
+          .post('/board/attack/' + board.id)
+          .send(coord)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.have.property('message');
+            res.body.message.should.be.eql('(0,str) is not a valid coordinate')
+            done();
+          });
+      });
+    });
+  });
+
+  describe('/GET board/reset/:id', () => {
     it('should GET board reset by id = :id', (done) => {
       const newBoard = createNewBoard();
       let battleResult = BattleShip.attackWaterAtPos(0, 0, newBoard.ocean);
@@ -231,6 +318,27 @@ describe('Boards', () => {
             done();
           });
       });
+    });
+    it('should GET board reset by id with empty db', (done) => {
+      chai.request(server)
+        .get('/board/reset/41224d776a326fb40f000001')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('message');
+          res.body.message.should.be.eql("Board 41224d776a326fb40f000001 not found");
+          res.body.should.not.have.property('board');
+          done();
+        });
+    });
+    it('should not GET board reset by id with invalid id', (done) => {
+      chai.request(server)
+        .get('/board/reset/1234')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.kind.should.be.eql("ObjectId");
+          res.body.path.should.be.eql("_id");
+          done();
+        });
     });
   });
 

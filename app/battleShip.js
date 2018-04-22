@@ -120,7 +120,7 @@ function checkInvalidWaterUnit(x, y, ocean){
 }
 
 function createEmptyWater(){
-  let newWater = Water.Water
+  const newWater = JSON.parse(JSON.stringify(Water.Water)); //clone the water
   return newWater;
 }
 
@@ -174,14 +174,14 @@ function _generateNewOcean(width, height, numBattleShip, numCruisers, numDestroy
 // battleResult : { type: Number }
 // 0 = invalid, 1 = miss, 2 = hit, 3 = sunk
 function attackWaterAtPos(x, y, ocean){
-  let targetWater = ocean[y][x];
-  if( x>9 || y>9 || x<0 || y<0 ){
-    return [0, "("+ x + ","+ y + ") is not a valid coordinate"]
+  if( !isNumber(x) || !isNumber(y) || x>9 || y>9 || x<0 || y<0 ){
+    return [0, "("+ x + ","+ y + ") is not a valid coordinate", ocean]
   }
+  let targetWater = ocean[y][x];
+
   if( targetWater.type !== 0 ) {
     return [0, "the position has already been attacked", ocean];
   }
-
   if( targetWater.unit == 0 ){
     ocean[y][x].type = 1;
     return [1, "Miss", ocean]
@@ -247,5 +247,10 @@ function trySunk(headX, headY, orientation, length, shipName, ocean){
       return [2, "Hit", ocean];
     }
 }
+
+// Returns if a value is really a number
+function isNumber (value) {
+  return typeof value === 'number' && isFinite(value);
+  };
 
 module.exports = { printOcean, generateClientBoard, generateNewOcean, attackWaterAtPos };

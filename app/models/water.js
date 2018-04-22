@@ -11,7 +11,7 @@
 //   orientation : {type: Number}
 // }
 
-let Water = {
+const Water = {
   type: 0,
   unit: 0,
   headPos: null,

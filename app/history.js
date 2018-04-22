@@ -21,9 +21,6 @@ function saveHistory( board, msg, callback ){
     }else{
       if (callback && typeof callback === 'function') {
         callback(boardHistory);
-        // Do some other stuff if callback is exists.
-      }else{
-        Logger.log("History saved!");
       }
     }
   });

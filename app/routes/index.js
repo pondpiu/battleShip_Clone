@@ -1,9 +1,5 @@
-const hello = require('./hello_routes');
 const board = require('./board_routes')
 module.exports = function(app) {
-  app.route('/hello')
-    .get(hello.getHello)
-    .post(hello.postHello);
 
   app.route('/board/list')
     .get(board.getBoards);
