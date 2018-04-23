@@ -47,10 +47,10 @@ attack route will be called with incremental position until win response is retu
 ## API
 
 ### CREATE A NEW BOARD
-Path: /board
-HTTP Method: GET
-Return Data: a client board and a response message
-Description: Get a new instance of a board
+Path: /board    
+HTTP Method: GET    
+Return Data: a client board and a response message  
+Description: Get a new instance of a board  
 
 Example: /board
 ```
@@ -72,10 +72,10 @@ Example: /board
 ```
 
 ### GETTING BOARDS
-Path: /board/list
-HTTP Method: GET
-Return Data: Array of board info `{ _id, moveNum }`
-Description: Get array of board info of all existing board
+Path: /board/list   
+HTTP Method: GET    
+Return Data: Array of board info `{ _id, moveNum }` 
+Description: Get array of board info of all existing board  
 
 Example: /board/list
 ```
@@ -95,10 +95,10 @@ Example: /board/list
 
 ### GETTING A BOARD BY ID
 
-Path: /board/{bid}
-HTTP Method: GET
-Return Data: a client board
-Description: get a board according to the given board ID parameter in the URI
+Path: /board/{bid}  
+HTTP Method: GET    
+Return Data: a client board 
+Description: get a board according to the given board ID parameter in the URI   
 
 URI parameter
 - bid(string): Board ID
@@ -124,10 +124,10 @@ Example: /board/5adcb3000959235b5c891a28
 
 ### ATTACK A BOARD BY ID
 
-Path: /board/attack/{bid}
-HTTP Method: POST
-Return Data: attack result message
-Description: make a attack on board with id = Board ID at position (x,y)
+Path: /board/attack/{bid}   
+HTTP Method: POST   
+Return Data: attack result message  
+Description: make a attack on board with id = Board ID at position (x,y)    
 
 URI parameter
 - bid(string): Board ID
@@ -146,10 +146,10 @@ Example: /board/attack/5adcb3000959235b5c891a28
 
 ### RESET A BOARD BY ID
 
-Path: /board/reset/{bid}
-HTTP Method: GET
-Return Data: reset result message
-Description: reset a board with id = Board ID
+Path: /board/reset/{bid}    
+HTTP Method: GET    
+Return Data: reset result message   
+Description: reset a board with id = Board ID   
 
 URI parameter
 - bid(string): Board ID
@@ -163,10 +163,10 @@ Example: /board/reset/5adcb3000959235b5c891a28
 
 ### GET BOARD HISTORY BY ID
 
-Path: /board/history/{bid}
-HTTP Method: GET
-Return Data: array of board history
-Description: get history of a board with id = Board ID
+Path: /board/history/{bid}  
+HTTP Method: GET    
+Return Data: array of board history 
+Description: get history of a board with id = Board ID  
 
 Example: /board/history/5add607651be5c53f4b1c9e1
 ```
