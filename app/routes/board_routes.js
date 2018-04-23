@@ -8,7 +8,7 @@ const BattleShip = require('../battleShip');
 const History = require('../history');
 
 function getBoards(req, res){
-  const query = Board.find({}, '_id moveNum createAt');
+  const query = Board.find({}, '_id moveNum updateAt');
   query.exec((err, boards) =>{
     if(err) { res.send(err); return; }
 

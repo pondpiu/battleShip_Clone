@@ -250,7 +250,7 @@ function trySunk(headX, headY, orientation, length, shipName, ocean){
 
 // Returns if a value is really a number
 function isNumber (value) {
-  return typeof value === 'number' && isFinite(value);
+  return typeof Number(value) == "number" && isFinite(value);
   };
 
 module.exports = { printOcean, generateClientBoard, generateNewOcean, attackWaterAtPos };
