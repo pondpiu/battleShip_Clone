@@ -101,8 +101,8 @@ Return Data: a client board
 Description: get a board according to the given board ID parameter in the URI
 
 URI parameter
+- bid(string): Board ID
 
-mid(int): Board ID
 Example: /board/5adcb3000959235b5c891a28
 
 ```
@@ -120,4 +120,91 @@ Example: /board/5adcb3000959235b5c891a28
         "createAt": "2018-04-22T16:06:28.680Z"
     }
 }
+```
+
+### ATTACK A BOARD BY ID
+
+Path: /board/attack/{bid}
+HTTP Method: POST
+Return Data: attack result message
+Description: make a attack on board with id = Board ID at position (x,y)
+
+URI parameter
+- bid(string): Board ID
+
+Body parameter
+- x(int): target position in x coordinate
+- y(int): target position in y coordinate
+
+Example: /board/attack/5adcb3000959235b5c891a28
+    with body: x = 2, y = 3
+```
+{
+    "message": "Miss"
+}
+```
+
+### RESET A BOARD BY ID
+
+Path: /board/reset/{bid}
+HTTP Method: GET
+Return Data: reset result message
+Description: reset a board with id = Board ID
+
+URI parameter
+- bid(string): Board ID
+
+Example: /board/reset/5adcb3000959235b5c891a28
+```
+{
+    "message": "Board reset secuessfully"
+}
+```
+
+### GET BOARD HISTORY BY ID
+
+Path: /board/history/{bid}
+HTTP Method: GET
+Return Data: array of board history
+Description: get history of a board with id = Board ID
+
+Example: /board/history/5add607651be5c53f4b1c9e1
+```
+[
+    { "ocean": 
+        [
+            [ { "type": 0, "unit": 3, "headPos": [2, 7], "orientation": 0},{"type": 0, "unit": 0, "headPos": null, "orientation": 0},  "type": 0, "unit": 0, "headPos": null, "orientation": 0}, { "type": 0, "unit": 0, "headPos": null, "orientation": 0}, {"type": 0, "unit": 0, "headPos": null, "orientation": 0}, {"type": 0, "unit": 0, "headPos": null, "orientation": 0}, {"type": 0, "unit": 0, "headPos": null, "orientation": 0}, {"type": 0, "unit": 0, "headPos": null,"orientation": 0}, { "type": 0, "unit": 0, "headPos": null, "orientation": 0}, {"type": 0, "unit": 0, "headPos": null, "orientation": 0}
+            ],
+            .
+            .
+            .
+            [ ... ]
+        ],
+        "_id": "5add607651be5c53f4b1c9e2",
+        "boardId": "5add607651be5c53f4b1c9e1",
+        "moveNum": 0,
+        "createAt": "2018-04-23T04:26:30.670Z",
+        "unitLeft": 10,
+        "message": "initialize",
+        "__v": 0
+    },
+    {
+        "ocean": 
+            [
+               [ ... ],
+                .
+                .
+                .
+                [ ... ]           
+            ]
+        ],
+        "_id": "5add607e51be5c53f4b1c9e3",
+        "boardId": "5add607651be5c53f4b1c9e1",
+        "moveNum": 1,
+        "createAt": "2018-04-23T04:26:38.078Z",
+        "unitLeft": 10,
+        "message": "Miss",
+        "__v": 0
+    }
+]
 ```
